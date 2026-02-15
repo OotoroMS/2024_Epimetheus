@@ -1,0 +1,39 @@
+# Unity specific ignores
+Library/
+Temp/
+Logs/
+Obj/
+MemoryCaptures/
+
+# Ignore the editor settings
+.vscode/
+.vs/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+
+# Ignore the build output
+*.meta
+
+# ビルド結果
+Build/
+Builds/
+
+# アセット
+Assets/Fonts
+Assets/TextMesh Pro/
+Assets/Settings/
+
+# 設定
+ProjectSettings/
+
+# その他

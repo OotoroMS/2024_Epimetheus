@@ -1,0 +1,11 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Test/BattleSystem/UI/USS/card.uss?fileID=7433441132597879392&amp;guid=3105da7d13658f642bbec4ff963ef33a&amp;type=3#card" />
+    <engine:VisualElement name="Root" class="card">
+        <engine:VisualElement name="Line" class="line" style="background-color: rgb(32, 146, 154);" />
+        <engine:VisualElement name="Thumbnail" style="flex-grow: 0; background-image: none; width: 140px; height: 140px; margin-top: 20px; margin-right: 20px; margin-bottom: 20px; margin-left: 35px; border-top-left-radius: 70px; border-top-right-radius: 70px; border-bottom-right-radius: 70px; border-bottom-left-radius: 70px;" />
+        <engine:VisualElement name="TextArea" style="flex-grow: 1; justify-content: center; -unity-font-definition: url(&quot;project://database/Assets/Fonts/BugMaruTTF022/BugMaruP-16.regular.ttf?fileID=12800000&amp;guid=16c532c6eb1bf5340a846b1d407a280a&amp;type=3#BugMaruP-16.regular&quot;);">
+            <engine:Label text="Name" name="Name" style="color: rgb(255, 255, 255); font-size: 32px; -unity-font-style: bold;" />
+            <engine:Label text="Something&#10;Something&#10;Something" name="Description" style="font-size: 24px; color: rgb(255, 255, 255); white-space: normal;" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

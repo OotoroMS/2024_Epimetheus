@@ -1,0 +1,115 @@
+{
+    "//Commnet1":[
+        "SkillData: プレイヤー、敵問わず使用するスキルの情報",
+        "   以下に構造を示す",
+        "      5大分別: スキルの種類 (攻撃、回復、強化、弱体化, 特殊)",
+        "          スキル名: スキルの名前",
+        "          スキル説明: スキルの説明",
+        "          消費MP: スキルの消費MP",
+        "          全体かbool: 対象が全体なら True, 単体なら False",
+        "          対象パラメータ: スキル発動対象に影響を及ぼす対象パラメータ",
+        "          根幹パラメータ: スキルの威力に影響を及ぼす発動者のパラメータ",
+        "          ===以下は攻撃、回復のみ存在する===",
+        "          基本威力: スキルの基本威力",
+        "          威力倍率: スキルの威力倍率",
+        "          ===以下は強化、弱体化のみ存在する===",
+        "          対象パラメータ変化量: 対象パラメータに影響を及ぼす変化量。倍率で記述",
+        "          継続ターン数: 強化、弱体化の効果が持続するターン数",
+        "          抵抗パラメータ: 対象が成功率に影響を及ぼすパラメータ",
+        "          基本成功率: スキルの基本成功率",
+        "          成功率倍率: スキルの成功率の変動量の倍率。sigmoid関数の倍率",
+        "          根幹倍率: スキルの成功確率の変動量に影響を及ぼす、根幹パラメータに対する倍率を記述",
+        "          抵抗倍率: スキルの成功確率の変動量に影響を及ぼす、抵抗パラメータに対する倍率を記述",
+        "          ===以下は特殊スキルのみ存在する===",
+        "          特殊スキルメソッド: 特殊スキルのメソッド名"
+    ],
+    "Skill": [
+        [
+            {
+                "Name": "ゴウ",
+                "Description": "炎の玉で敵１体を攻撃",
+                "Cost": 10,
+                "IsAll": false,
+                "TargetParam": 0,
+                "RootParam": 0,
+                "BasePower": 10,
+                "PowerRate": 1.0
+            },
+            {
+                "Name": "バン",
+                "Description": "爆発で敵全体を攻撃",
+                "Cost": 10,
+                "IsAll": true,
+                "TargetParam": 0,
+                "RootParam": 0,
+                "BasePower": 10,
+                "PowerRate": 1.0
+            }
+        ],
+        [
+            {
+                "Name": "フィルア",
+                "Description": "味方一人を少し回復",
+                "Cost": 10,
+                "IsAll": false,
+                "TargetParam": 1,
+                "RootParam": 1,
+                "BasePower": 10,
+                "PowerRate": 1.0
+            },
+            {
+                "Name": "ゼオミフィルア",
+                "Description": "味方全体を中程度回復",
+                "Cost": 10,
+                "IsAll": true,
+                "TargetParam": 1,
+                "RootParam": 1,
+                "BasePower": 10,
+                "PowerRate": 1.0
+            }
+        ],
+        [
+            {
+                "Name": "強化スキル1",
+                "Description": "強化スキル1の説明",
+                "Cost": 10,
+                "IsAll": false,
+                "TargetParam": 2,
+                "RootParam": 2,
+                "TargetParamChange": 1.0,
+                "Turn": 3,
+                "ResistParam": 3,
+                "BaseRate": 0.5,
+                "RateRate": 1.0,
+                "RootRate": 1.0,
+                "ResistRate": 1.0
+            }
+        ],
+        [
+            {
+                "Name": "弱体化スキル1",
+                "Description": "弱体化スキル1の説明",
+                "Cost": 10,
+                "IsAll": false,
+                "TargetParam": 3,
+                "RootParam": 3,
+                "TargetParamChange": 1.0,
+                "Turn": 3,
+                "ResistParam": 4,
+                "BaseRate": 0.5,
+                "RateRate": 1.0,
+                "RootRate": 1.0,
+                "ResistRate": 1.0
+            }
+        ],
+        [
+            {
+                "Name": "特殊スキル1",
+                "Description": "特殊スキル1の説明",
+                "Cost": 10,
+                "IsAll": false,
+                "SpecialMethod": "SpecialMethod1"
+            }
+        ]
+    ]
+}

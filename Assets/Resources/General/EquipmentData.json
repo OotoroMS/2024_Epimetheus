@@ -1,0 +1,45 @@
+{
+    "//Comment": [
+        "Equipment: 装備品のデータ",
+        "   以下に構造を示す",
+        "       装備種類: 0:武器, 1:盾, 2:防具, 3:アクセサリ",
+        "           名前: 装備品の名前",
+        "           説明: 装備品の説明",
+        "           パラメータ変化量: [HP, MP, 攻撃力, 防御力, 魔法攻撃力, 魔法防御力, 素早さ, 運命力]",
+        "           装備可能bool: bool値で記述 [キャラ0, キャラ1, キャラ2, キャラ3]"
+    ],
+    "Equipment": [
+        [
+            {
+                "Name": "鉄の剣",
+                "Description": "鉄でできた剣",
+                "ParameterChange": [0, 0, 10, 0, 0, 0, 0, 0],
+                "Equipable": [true, true, true, true]
+            }
+        ],
+        [
+            {
+                "Name": "鉄の盾",
+                "Description": "鉄でできた盾",
+                "ParameterChange": [0, 0, 0, 10, 0, 0, 0, 0],
+                "Equipable": [true, true, true, true]
+            }
+        ],
+        [
+            {
+                "Name": "鉄の鎧",
+                "Description": "鉄でできた鎧",
+                "ParameterChange": [0, 0, 0, 0, 0, 0, 0, 0],
+                "Equipable": [true, true, true, true]
+            }
+        ],
+        [
+            {
+                "Name": "鉄の腕輪",
+                "Description": "鉄でできた腕輪",
+                "ParameterChange": [0, 0, 0, 0, 0, 0, 0, 0],
+                "Equipable": [true, true, true, true]
+            }
+        ]
+    ]
+}

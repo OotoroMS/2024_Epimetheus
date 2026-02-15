@@ -1,0 +1,8 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:VisualElement name="Root" style="flex-grow: 1;">
+        <engine:VisualElement name="IconAlign" style="flex-grow: 1; align-content: auto; align-self: center; flex-direction: row; height: 200px; position: absolute; width: 400px;">
+            <engine:VisualElement name="Icon" style="flex-grow: 1; left: 0; top: 0; position: relative; width: 200px; height: 200px; background-color: rgba(0, 0, 0, 0.55);" />
+            <engine:Label text="NAME" name="Name" style="position: relative; right: auto; top: auto; left: auto; bottom: auto; width: 200px; height: 100px; align-self: center; justify-content: flex-start; -unity-text-align: middle-left; padding-left: 10px; font-size: 60px;" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

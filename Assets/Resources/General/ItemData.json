@@ -1,0 +1,73 @@
+{
+    "//Comment": [
+        "Item: アイテムのデータ",
+        "   以下に構造を示す",
+        "       5大分別: アイテムの種類 (攻撃、回復、強化、弱体化、特殊)",
+        "           アイテム名: アイテムの名前",
+        "           アイテム説明: アイテムの説明",
+        "           全体かbool: 対象が全体なら True, 単体なら False",
+        "           ===以下は回復、強化アイテムのみ存在する===",
+        "           対象パラメータ: アイテムの効果対象となるパラメータ",
+        "           対象パラメータ変化量: アイテムの効果対象となるパラメータに影響を及ぼす変化量",
+        "           ===以下は強化、弱体化アイテムのみ存在する===",
+        "           対象パラメータ変化量: 対象パラメータに影響を及ぼす変化量。倍率で記述",
+        "           継続ターン数: 強化、弱体化の効果が持続するターン数",
+        "           成功率: アイテムの成功率",
+        "           ===以下は特殊アイテムのみ存在する===",
+        "           特殊アイテムメソッド: 特殊アイテムのメソッド名"
+    ],
+    "Item": [
+        [
+            {
+                "Name": "小型爆薬",
+                "Description": "敵１体に爆発ダメージ",
+                "IsAll": false,
+                "TargetParam": "HP",
+                "TargetParamChange": 10
+            },
+            {
+                "Name": "バチンバの実",
+                "Description": "敵一体に爆発ダメージ",
+                "IsAll": false,
+                "TargetParam": "HP",
+                "TargetParamChange": 10
+            }
+        ],
+        [
+            {
+                "Name": "携帯型簡易ポーション",
+                "Description": "味方１人を回復",
+                "IsAll": false,
+                "TargetParam": "HP",
+                "TargetParamChange": 10
+            }
+        ],
+        [
+            {
+                "Name": "瞬時強化薬・攻撃",
+                "Description": "攻撃力を強化",
+                "TargetParam": "At",
+                "TargetParamChange": 1.5,
+                "Turn": 3,
+                "SuccessRate": 1.0
+            }
+        ],
+        [
+            {
+                "Name": "外用弱化薬・攻撃",
+                "Description": "攻撃力を弱体化",
+                "TargetParam": "At",
+                "TargetParamChange": 0.5,
+                "Turn": 3,
+                "SuccessRate": 0.5
+            }
+        ],
+        [
+            {
+                "Name": "特殊アイテム",
+                "Description": "特殊アイテムの説明",
+                "SpecialItemMethod": "SpecialItemMethod"
+            }
+        ]
+    ]
+}

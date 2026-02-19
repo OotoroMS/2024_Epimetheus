@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using Newtonsoft.Json;
-using System.IO;
 
 [System.Serializable]
 public class ChrctrPrmtrs{
@@ -40,9 +38,9 @@ public class ChrctrPrmtrs{
         // 女神像を保持しているか
         hold_GoddessIdle = false;
         
-        // Resources内の「General/CharacterParams.json」から読み込む
-        TextAsset jsonText = Resources.Load<TextAsset>("General/CharacterParams");
-        if (jsonText == null)
+        // 共有データの「Assets/Shared/Data/Raw/CharacterParams.json」から読み込む
+        string jsonText = JsonFileLoader.LoadText("Assets/Shared/Data/Raw/CharacterParams.json");
+        if (string.IsNullOrEmpty(jsonText))
         {
             Debug.LogError("CharacterParams.jsonが見つかりません");
             return;
@@ -50,7 +48,7 @@ public class ChrctrPrmtrs{
 
         // JSONをパースして、デシリアライズする
         var jl_Character = new JsonLoader.Character();
-        var jsonData = jl_Character.LoadCharacterParams(jsonText.text);
+        var jsonData = jl_Character.LoadCharacterParams(jsonText);
         
         // Elmnt_Parametersの初期化
         Elmnt_Parameters = new Dictionary<string, int>();
@@ -105,9 +103,9 @@ public class ChrctrPrmtrs{
     // レベルアップ処理
     public void LevelUp()
     {
-        // Resources内の「General/CharacterParams.json」から読み込む
-        TextAsset json = Resources.Load<TextAsset>("General/CharacterParams");
-        if (json == null)
+        // 共有データの「Assets/Shared/Data/Raw/CharacterParams.json」から読み込む
+        string json = JsonFileLoader.LoadText("Assets/Shared/Data/Raw/CharacterParams.json");
+        if (string.IsNullOrEmpty(json))
         {
             Debug.LogError("CharacterParams.jsonが見つかりません");
             return;
@@ -116,7 +114,7 @@ public class ChrctrPrmtrs{
         // JSONをパースして、デシリアライズする
         var jloader = new JsonLoader();
         var jl_Character = new JsonLoader.Character();
-        var jsonData = jl_Character.LoadCharacterParams(json.text);
+        var jsonData = jl_Character.LoadCharacterParams(json);
 
         // 次の中間パラメータを取得
         var nextParamsList = jsonData.MiddleParams;

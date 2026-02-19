@@ -6,10 +6,11 @@
 - 戦闘参加者（Player/Enemy）の状態遷移と、勝敗判定のオーケストレーションを行う。
 
 ## Public API / Entry points
-- Sceneエントリ: `Assets/Test/BattleSystem/Test_Battle.unity`（検証シーン）。
-- Managerエントリ: `Assets/Test/BattleSystem/Scripts/Test_BattleManager_v2.cs`。
-- UIエントリ: `Assets/Test/BattleSystem/Scripts/Test_BattleManagerUI_v2.cs`。
-- UI Toolkitエントリ: `Assets/Test/BattleSystem/UI/Scripts/UIToolkit_Battle_Test.cs`。
+- Sceneエントリ: `Assets/Features/Battle/Scenes/Test_Battle.unity`（検証シーン）。
+- Managerエントリ: `Assets/Features/Battle/Code/Runtime/Test_BattleManager_v2.cs`。
+- UIエントリ: `Assets/Features/Battle/Code/Runtime/Test_BattleManagerUI_v2.cs`。
+- UI Toolkitエントリ: `Assets/Features/Battle/Code/Presentation/UIToolkit_Battle_Test.cs`。
+- 補足: 旧配置の `Assets/Features/Battle/Code/Scripts/...` は廃止済み。現在の参照先は `Code/Runtime`（進行管理/UIロジック）と `Code/Presentation`（UI Toolkit関連）に統一する。
 
 ## Invariants
 - 1ターン内で同一ユニットが複数回行動しないこと。

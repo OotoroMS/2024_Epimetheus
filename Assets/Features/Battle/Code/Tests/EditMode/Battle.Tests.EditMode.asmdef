@@ -1,0 +1,23 @@
+{
+  "name": "Battle.Tests.EditMode",
+  "rootNamespace": "Battle.Tests.EditMode",
+  "references": [
+    "Battle.Core",
+    "Battle.Runtime",
+    "Battle.Presentation"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

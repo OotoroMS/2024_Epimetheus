@@ -29,7 +29,7 @@ namespace BattleUI_Test
 
         public BTN_MainCommand()
         {
-            var treeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Test/BattleSystem/UI/UXML/BTN_MainCommand.uxml");
+            var treeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Features/Battle/Content/UI/UXML/BTN_MainCommand.uxml");
             var container = treeAsset.Instantiate();
             hierarchy.Add(container);
 

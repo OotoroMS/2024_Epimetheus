@@ -1,0 +1,21 @@
+{
+  "name": "Battle.Tests.PlayMode",
+  "rootNamespace": "Battle.Tests.PlayMode",
+  "references": [
+    "Battle.Core",
+    "Battle.Runtime",
+    "Battle.Presentation"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

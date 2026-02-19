@@ -12,12 +12,12 @@ public static class JsonFileLoader
         }
 
         string fullPath = Path.Combine(Directory.GetParent(Application.dataPath).FullName, assetRelativePath);
-        if (!File.Exists(fullPath))
+        string jsonText = FileTextLoader.LoadText(fullPath);
+        if (jsonText == null)
         {
             Debug.LogError($"JSONファイルが見つかりません: {fullPath}");
-            return null;
         }
 
-        return File.ReadAllText(fullPath);
+        return jsonText;
     }
 }

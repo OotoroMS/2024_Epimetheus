@@ -19,14 +19,14 @@ public class EnmyPemtrs{
         Nrml_Parameters = new Dictionary<string, int>();
 
         // jsonファイルからパラメータを読み込む
-        TextAsset jsonText = Resources.Load<TextAsset>("Battle/EnemyParams");
-        if(jsonText == null){
+        string jsonText = JsonFileLoader.LoadText("Assets/Features/Battle/Data/Raw/EnemyParams.json");
+        if(string.IsNullOrEmpty(jsonText)){
             Debug.LogError("EnemyParams.jsonが見つかりません");
             return;
         }
         // JSONをパースして、デシリアライズする
         var jl_Enemy = new JsonLoader.Enemy();
-        var jsonData = jl_Enemy.LoadEnemyParams(jsonText.text, Chara_ID);
+        var jsonData = jl_Enemy.LoadEnemyParams(jsonText, Chara_ID);
         if(jsonData == null){
             Debug.LogError("EnemyParams.jsonのデシリアライズに失敗しました");
             return;

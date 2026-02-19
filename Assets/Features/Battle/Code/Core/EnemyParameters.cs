@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class EnmyPemtrs{
+public class EnemyParameters{
     public string Name { get; private set; }    // 名前
     public int Chara_ID { get; private set; }    // 敵の種類ID
     public int Unique_Num { get; private set; }  // 戦闘中のユニーク番号
@@ -13,7 +13,7 @@ public class EnmyPemtrs{
     public Dictionary<string, int> Crrnt_Parameters { get; private set; }    // 現在のパラメータ
 
     // コンストラクタ
-    public EnmyPemtrs(char unique_char, int chara_id, int unique_num){
+    public EnemyParameters(char unique_char, int chara_id, int unique_num){
         Chara_ID = chara_id;
         Unique_Num = unique_num;
         Nrml_Parameters = new Dictionary<string, int>();

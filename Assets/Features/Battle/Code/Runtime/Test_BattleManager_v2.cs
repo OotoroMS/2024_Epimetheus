@@ -5,8 +5,8 @@ using System.Collections;
 public class Test_BattleManager_v2 : MonoBehaviour
 {
     // 変数宣言
-    private List<ChrctrPrmtrs> pl_chrctrs; // プレイヤーのリスト
-    private List<EnmyPemtrs> enemies; // 敵のリスト
+    private List<CharacterParameters> pl_chrctrs; // プレイヤーのリスト
+    private List<EnemyParameters> enemies; // 敵のリスト
     private List<TurnCommand> commands; // コマンドリスト
 
     // Start is called before the first frame update
@@ -14,10 +14,10 @@ public class Test_BattleManager_v2 : MonoBehaviour
     {
         // =============================プロトタイプのみの処理=============================
         // キャラクターの初期化
-           pl_chrctrs = new List<ChrctrPrmtrs>();
+           pl_chrctrs = new List<CharacterParameters>();
         for (int i = 0; i < Constants.Character.Chrctr_Names.Length; i++)
         {
-            pl_chrctrs.Add(new ChrctrPrmtrs(i));
+            pl_chrctrs.Add(new CharacterParameters(i));
         }
         // ================================================================================
 
@@ -62,9 +62,9 @@ public class Test_BattleManager_v2 : MonoBehaviour
     }
 
     // 敵チームの作成（ランダム生成）
-    private List<EnmyPemtrs> CreateEnemyTeam(int count)
+    private List<EnemyParameters> CreateEnemyTeam(int count)
     {
-        List<EnmyPemtrs> enemyTeam = new List<EnmyPemtrs>();
+        List<EnemyParameters> enemyTeam = new List<EnemyParameters>();
         for (int i = 0; i < count; i++)
         {
             // 敵の抽選
@@ -79,7 +79,7 @@ public class Test_BattleManager_v2 : MonoBehaviour
                     unique_num = (char)(unique_num + 1);
                 }
             }
-            enemyTeam.Add(new EnmyPemtrs(unique_num, enemyID, i+Constants.Battle.Prefix_Enemy));    // 敵の生成
+            enemyTeam.Add(new EnemyParameters(unique_num, enemyID, i+Constants.Battle.Prefix_Enemy));    // 敵の生成
         }
 
         // 敵の生成確認

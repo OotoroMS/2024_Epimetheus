@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using System.IO;
 
 [System.Serializable]
-public class ChrctrPrmtrs{
+public class CharacterParameters{
     public string Name { get; private set; }    // キャラクター名
     public int Chara_ID { get; private set; }    // キャラクターID
     public int Level { get; private set; }     // レベル
@@ -23,7 +23,7 @@ public class ChrctrPrmtrs{
 
 
     // コンストラクタ
-    public ChrctrPrmtrs(int ID)
+    public CharacterParameters(int ID)
     {
         // キャラクターIDを設定
         Chara_ID = ID;

@@ -31,7 +31,7 @@ namespace UIToolkitExamplesC
 
         public Card()
         {
-            var treeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Test/BattleSystem/UI/UXML/Card.uxml");
+            var treeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Features/Battle/Content/UI/UXML/Card.uxml");
             var container = treeAsset.Instantiate();
             hierarchy.Add(container);
 

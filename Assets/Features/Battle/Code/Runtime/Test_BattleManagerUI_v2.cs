@@ -38,7 +38,7 @@ public class Test_BattleManagerUI_v2 : MonoBehaviour
     //# BattleManagerから呼び出し
     //## UIの初期化
     //### 敵UIの初期化
-    public void InitializeEnemyUI(List<EnmyPemtrs> enemies)
+    public void InitializeEnemyUI(List<EnemyParameters> enemies)
     {
         // 敵UIの初期化
         foreach (Transform child in enemyUIParent)
@@ -66,7 +66,7 @@ public class Test_BattleManagerUI_v2 : MonoBehaviour
         }
     }
     //### プレイヤーUIの初期化
-    public void InitializePlayerUI(List<ChrctrPrmtrs> players)
+    public void InitializePlayerUI(List<CharacterParameters> players)
     {
         // ガード（Inspector未設定などの二次被害を止める）
         if (players == null || players.Count == 0)

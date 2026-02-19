@@ -1,26 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Newtonsoft.Json;
-using System.IO;
 
 public class JsonLoader
 {
     public class Character{
         public Jdata_CharacterParams LoadCharacterParams(string jsonString)
         {
-            try
-            {
-                // デシリアライズ
-                Jdata_CharacterParams characterParams = JsonConvert.DeserializeObject<Jdata_CharacterParams>(jsonString);
-
-                return characterParams;
-            }
-            catch (System.Exception ex)
-            {
-                UnityEngine.Debug.LogError($"デシリアライズ中にエラーが発生しました: {ex.Message}");
-                return null;
-            }
+            return JsonConvert.DeserializeObject<Jdata_CharacterParams>(jsonString);
         }
 
         [System.Serializable]
@@ -50,18 +36,7 @@ public class JsonLoader
     public class Enemy{
         public Jdata_EnemyParams LoadEnemyParams(string jsonString, int chara_id)
         {
-            try
-            {
-                // デシリアライズ
-                Jdata_EnemyParams enemyParams = JsonConvert.DeserializeObject<Jdata_EnemyParams>(jsonString);
-
-                return enemyParams;
-            }
-            catch (System.Exception ex)
-            {
-                Debug.LogError($"デシリアライズ中にエラーが発生しました: {ex.Message}");
-                return null;
-            }
+            return JsonConvert.DeserializeObject<Jdata_EnemyParams>(jsonString);
         }
 
         [System.Serializable]

@@ -1,8 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using UnityEngine;
-using Newtonsoft.Json;
-using System.IO;
 
 [System.Serializable]
 public class CharacterParameters{
@@ -20,11 +16,21 @@ public class CharacterParameters{
     public Dictionary<string, int> Equipment { get; private set; }    // 装備品
     public Dictionary<string, int> AbnormalStatus { get; private set; }    // 状態異常
     public bool hold_GoddessIdle { get; private set; }
+    private readonly JsonLoader.Character.Jdata_CharacterParams characterData;
+    private readonly IBattleLogger logger;
 
 
     // コンストラクタ
-    public CharacterParameters(int ID)
+    public CharacterParameters(int ID, JsonLoader.Character.Jdata_CharacterParams data, IBattleLogger battleLogger = null)
     {
+        characterData = data;
+        logger = battleLogger;
+        if (characterData == null)
+        {
+            logger?.LogError("CharacterParams が null です。");
+            return;
+        }
+
         // キャラクターIDを設定
         Chara_ID = ID;
         // キャラクター名を設定
@@ -40,29 +46,17 @@ public class CharacterParameters{
         // 女神像を保持しているか
         hold_GoddessIdle = false;
         
-        // Resources内の「General/CharacterParams.json」から読み込む
-        TextAsset jsonText = Resources.Load<TextAsset>("General/CharacterParams");
-        if (jsonText == null)
-        {
-            Debug.LogError("CharacterParams.jsonが見つかりません");
-            return;
-        }
-
-        // JSONをパースして、デシリアライズする
-        var jl_Character = new JsonLoader.Character();
-        var jsonData = jl_Character.LoadCharacterParams(jsonText.text);
-        
         // Elmnt_Parametersの初期化
         Elmnt_Parameters = new Dictionary<string, int>();
         for (int i = 0; i < Constants.Parameters.Parameter_Names.Length; i++)
         {
-            if (i < jsonData.InitialParams[0].Length)
+            if (i < characterData.InitialParams[0].Length)
             {
-                Elmnt_Parameters[Constants.Parameters.Parameter_Names[i]] = jsonData.InitialParams[0][i];
+                Elmnt_Parameters[Constants.Parameters.Parameter_Names[i]] = characterData.InitialParams[0][i];
             }
             else
             {
-                Debug.LogWarning($"Parameter_Namesのインデックス {i} が InitialParams[0] の範囲を超えています。");
+                logger?.LogWarning($"Parameter_Namesのインデックス {i} が InitialParams[0] の範囲を超えています。");
             }
         }
 
@@ -71,13 +65,13 @@ public class CharacterParameters{
         Equipment = new Dictionary<string, int>();
         for (int i = 0; i < Constants.Equipment.Equipment_Names.Length; i++)
         {
-            if (i < jsonData.InitialEquip[0].Length)
+            if (i < characterData.InitialEquip[0].Length)
             {
-                Equipment[Constants.Equipment.Equipment_Names[i]] = jsonData.InitialEquip[0][i];
+                Equipment[Constants.Equipment.Equipment_Names[i]] = characterData.InitialEquip[0][i];
             }
             else
             {
-                UnityEngine.Debug.LogWarning($"Equipment_Namesのインデックス {i} が InitialEquip[0] の範囲を超えています。");
+                logger?.LogWarning($"Equipment_Namesのインデックス {i} が InitialEquip[0] の範囲を超えています。");
             }
         }
 
@@ -93,7 +87,7 @@ public class CharacterParameters{
         // 加入レベルまでレベルアップさせる
         Level = 1;
         // 初期パラメータ内に加入レベルが含まれているか確認
-        while (Level < jsonData.InitialParams[Chara_ID][8])
+        while (Level < characterData.InitialParams[Chara_ID][8])
         {
             LevelUp();
         }
@@ -105,21 +99,8 @@ public class CharacterParameters{
     // レベルアップ処理
     public void LevelUp()
     {
-        // Resources内の「General/CharacterParams.json」から読み込む
-        TextAsset json = Resources.Load<TextAsset>("General/CharacterParams");
-        if (json == null)
-        {
-            Debug.LogError("CharacterParams.jsonが見つかりません");
-            return;
-        }
-
-        // JSONをパースして、デシリアライズする
-        var jloader = new JsonLoader();
-        var jl_Character = new JsonLoader.Character();
-        var jsonData = jl_Character.LoadCharacterParams(json.text);
-
         // 次の中間パラメータを取得
-        var nextParamsList = jsonData.MiddleParams;
+        var nextParamsList = characterData.MiddleParams;
         for(int i=0; i < nextParamsList.Length; i++)
         {
             // 現在のリストと現在のレベルを比較
@@ -188,6 +169,6 @@ public class CharacterParameters{
         {
             log += $"\t{key}: {Elmnt_Parameters[key]}, ";
         }
-        Debug.Log(log);
+        logger?.Log(log);
     }
 }

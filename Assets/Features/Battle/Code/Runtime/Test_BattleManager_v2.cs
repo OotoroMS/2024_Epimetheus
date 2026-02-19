@@ -8,16 +8,21 @@ public class Test_BattleManager_v2 : MonoBehaviour
     private List<CharacterParameters> pl_chrctrs; // プレイヤーのリスト
     private List<EnemyParameters> enemies; // 敵のリスト
     private List<TurnCommand> commands; // コマンドリスト
+    private IBattleLogger logger;
+    private JsonLoader.Character.Jdata_CharacterParams characterData;
 
     // Start is called before the first frame update
     void Start()
     {
+        logger = new UnityBattleLogger();
+        characterData = BattleRuntimeDataLoader.LoadCharacterParams("General/CharacterParams", logger);
+
         // =============================プロトタイプのみの処理=============================
         // キャラクターの初期化
            pl_chrctrs = new List<CharacterParameters>();
         for (int i = 0; i < Constants.Character.Chrctr_Names.Length; i++)
         {
-            pl_chrctrs.Add(new CharacterParameters(i));
+            pl_chrctrs.Add(new CharacterParameters(i, characterData, logger));
         }
         // ================================================================================
 
@@ -79,7 +84,8 @@ public class Test_BattleManager_v2 : MonoBehaviour
                     unique_num = (char)(unique_num + 1);
                 }
             }
-            enemyTeam.Add(new EnemyParameters(unique_num, enemyID, i+Constants.Battle.Prefix_Enemy));    // 敵の生成
+            var enemyData = BattleRuntimeDataLoader.LoadEnemyParams("Battle/EnemyParams", enemyID, logger);
+            enemyTeam.Add(new EnemyParameters(unique_num, enemyID, i+Constants.Battle.Prefix_Enemy, enemyData, logger));    // 敵の生成
         }
 
         // 敵の生成確認

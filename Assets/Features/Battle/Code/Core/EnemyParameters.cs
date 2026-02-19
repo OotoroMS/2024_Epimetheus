@@ -1,4 +1,3 @@
-using UnityEngine;
 using System.Collections.Generic;
 
 public class EnemyParameters{
@@ -11,48 +10,46 @@ public class EnemyParameters{
     public int[] Item { get; private set; }    // ドロップアイテム
     public Dictionary<string, int> Nrml_Parameters { get; private set; }    // 通常パラメータ
     public Dictionary<string, int> Crrnt_Parameters { get; private set; }    // 現在のパラメータ
+    private readonly IBattleLogger logger;
 
     // コンストラクタ
-    public EnemyParameters(char unique_char, int chara_id, int unique_num){
+    public EnemyParameters(char unique_char, int chara_id, int unique_num, JsonLoader.Enemy.Jdata_EnemyParams enemyData, IBattleLogger battleLogger = null){
+        logger = battleLogger;
         Chara_ID = chara_id;
         Unique_Num = unique_num;
         Nrml_Parameters = new Dictionary<string, int>();
 
-        // jsonファイルからパラメータを読み込む
-        TextAsset jsonText = Resources.Load<TextAsset>("Battle/EnemyParams");
-        if(jsonText == null){
-            Debug.LogError("EnemyParams.jsonが見つかりません");
+        if(enemyData == null){
+            logger?.LogError("EnemyParams が null です");
             return;
         }
-        // JSONをパースして、デシリアライズする
-        var jl_Enemy = new JsonLoader.Enemy();
-        var jsonData = jl_Enemy.LoadEnemyParams(jsonText.text, Chara_ID);
-        if(jsonData == null){
-            Debug.LogError("EnemyParams.jsonのデシリアライズに失敗しました");
+
+        if(enemyData.NormalEnemy == null || Chara_ID >= enemyData.NormalEnemy.Length){
+            logger?.LogError($"EnemyParams の Chara_ID が不正です: {Chara_ID}");
             return;
         }
         
         // 名前の設定
-        Name = jsonData.NormalEnemy[Chara_ID].Name + unique_char;
+        Name = enemyData.NormalEnemy[Chara_ID].Name + unique_char;
 
         // レベルの設定
-        Level = jsonData.NormalEnemy[Chara_ID].Level;
+        Level = enemyData.NormalEnemy[Chara_ID].Level;
 
         // スキルの設定
 
 
         // 通常パラメータの設定
-        if(jsonData.NormalEnemy[Chara_ID].Params != null){
+        if(enemyData.NormalEnemy[Chara_ID].Params != null){
             for(int i=0; i<Constants.Parameters.Parameter_Names.Length; i++){
-                if (i < jsonData.NormalEnemy[Chara_ID].Params.Length){
-                    Nrml_Parameters[Constants.Parameters.Parameter_Names[i]] = jsonData.NormalEnemy[Chara_ID].Params[i];
+                if (i < enemyData.NormalEnemy[Chara_ID].Params.Length){
+                    Nrml_Parameters[Constants.Parameters.Parameter_Names[i]] = enemyData.NormalEnemy[Chara_ID].Params[i];
                 }else{
-                    Debug.LogError($"EnemyParams.jsonのパラメータが足りません: {Constants.Parameters.Parameter_Names[i]}");
+                    logger?.LogError($"EnemyParams.jsonのパラメータが足りません: {Constants.Parameters.Parameter_Names[i]}");
                     return;
                 }
             }
         }else{
-            Debug.LogError("EnemyParams.jsonのパラメータが空です");
+            logger?.LogError("EnemyParams.jsonのパラメータが空です");
             return;
         }
 

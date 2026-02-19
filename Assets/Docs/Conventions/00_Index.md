@@ -14,3 +14,8 @@
 - 共有はSharedへ。ただしSharedはMechanismのみ（Policyは入れない）
 - 依存は一方向（Core→Runtime→Presentation）
 - CoreはUnityEngine参照禁止（原則）
+
+## Feature README
+- Battle: `Assets/Features/Battle/Docs/README.md`
+- Dungeon: `Assets/Features/Dungeon/Docs/README.md`
+- Title: `Assets/Features/Title/Docs/README.md`

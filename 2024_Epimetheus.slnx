@@ -1,4 +1,8 @@
 ﻿<Solution>
+  <Project Path="Battle.Presentation.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="Battle.Core.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
+  <Project Path="Battle.Runtime.csproj" />
+  <Project Path="Battle.Tests.PlayMode.csproj" />
 </Solution>

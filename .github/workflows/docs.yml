@@ -61,7 +61,8 @@ jobs:
           # 大量に拾うとサイトが肥大化するので、Unityの生成物は除外
           exclude_dir_names = {
             ".git", "Library", "Temp", "Obj", "Build", "Logs",
-            "UserSettings", ".plastic", ".vscode"
+            "UserSettings", ".plastic", ".vscode",
+            "DocsSite"
           }
 
           def should_skip_dir(p: pathlib.Path) -> bool:
@@ -86,6 +87,11 @@ jobs:
 
           count = 0
           for dirpath, dirnames, filenames in os.walk(ROOT):
+            dp = pathlib.Path(dirpath)
+            # ★生成先( DocsSite )以下は問答無用で無視
+            if (ROOT / "DocsSite") in dp.parents or dp == (ROOT / "DocsSite"):
+                dirnames[:] = []
+                continue
             dp = pathlib.Path(dirpath)
             if should_skip_dir(dp):
               dirnames[:] = []

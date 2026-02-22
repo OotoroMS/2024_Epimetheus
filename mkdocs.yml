@@ -1,0 +1,9 @@
+site_name: 2024 EPIMETHEUS Docs
+docs_dir: DocsSite
+site_dir: site
+
+theme:
+  name: material
+
+plugins:
+  - search

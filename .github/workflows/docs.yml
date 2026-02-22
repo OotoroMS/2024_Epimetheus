@@ -1,0 +1,169 @@
+name: Deploy Docs (MkDocs)
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install MkDocs
+        run: pip install mkdocs mkdocs-material
+
+      - name: Generate DocsSite (specs + text references)
+        run: |
+          set -euo pipefail
+
+          rm -rf DocsSite
+          mkdir -p DocsSite
+
+          # 1) 仕様（あなたの "Docs" 相当）をコピー
+          # 例：Assets/Docs を正とする（必要なら追加）
+          if [ -d "Assets/Docs" ]; then
+            mkdir -p DocsSite/Specs
+            rsync -a --delete "Assets/Docs/" "DocsSite/Specs/"
+          fi
+
+          # 2) 参照用：テキスト系ファイルを Markdown に変換して格納
+          # meta は除外。必要に応じて拡張子を足す。
+          python - <<'PY'
+          import os, pathlib
+
+          ROOT = pathlib.Path(".").resolve()
+          OUT  = ROOT / "DocsSite" / "Ref"
+          OUT.mkdir(parents=True, exist_ok=True)
+
+          include_ext = {
+            ".md", ".txt",
+            ".json", ".yml", ".yaml",
+            ".cs", ".uxml", ".uss", ".asmdef",
+            ".xml", ".shader", ".cginc", ".hlsl",
+            ".toml", ".ini", ".cfg"
+          }
+
+          # 大量に拾うとサイトが肥大化するので、Unityの生成物は除外
+          exclude_dir_names = {
+            ".git", "Library", "Temp", "Obj", "Build", "Logs",
+            "UserSettings", ".plastic", ".vscode"
+          }
+
+          def should_skip_dir(p: pathlib.Path) -> bool:
+            return any(part in exclude_dir_names for part in p.parts)
+
+          def lang_from_ext(ext: str) -> str:
+            return {
+              ".cs":"csharp", ".json":"json", ".yml":"yaml", ".yaml":"yaml",
+              ".uxml":"xml", ".uss":"css", ".xml":"xml",
+              ".shader":"c", ".hlsl":"hlsl", ".cginc":"c",
+              ".toml":"toml", ".ini":"ini", ".cfg":"ini", ".md":"markdown", ".txt":"text"
+            }.get(ext, "text")
+
+          def safe_read_text(fp: pathlib.Path) -> str | None:
+            try:
+              return fp.read_text(encoding="utf-8")
+            except UnicodeDecodeError:
+              try:
+                return fp.read_text(encoding="utf-8-sig")
+              except Exception:
+                return None
+
+          count = 0
+          for dirpath, dirnames, filenames in os.walk(ROOT):
+            dp = pathlib.Path(dirpath)
+            if should_skip_dir(dp):
+              dirnames[:] = []
+              continue
+
+            # metaや巨大生成物を避けるため、dirnamesも一部フィルタ
+            dirnames[:] = [d for d in dirnames if d not in exclude_dir_names]
+
+            for fn in filenames:
+              src = dp / fn
+              if src.suffix == ".meta":
+                continue
+              if src.suffix.lower() not in include_ext:
+                continue
+
+              # 仕様フォルダ内の md は「Specs」にあるので Ref は重複させない（任意）
+              # ここは好みで。重複が嫌ならスキップ。
+              # if "Assets/Docs" in src.as_posix():
+              #   continue
+
+              rel = src.relative_to(ROOT)
+
+              text = safe_read_text(src)
+              if text is None:
+                continue  # バイナリ/読めないものは除外
+
+              out_md = OUT / (str(rel) + ".md")
+              out_md.parent.mkdir(parents=True, exist_ok=True)
+
+              lang = lang_from_ext(src.suffix.lower())
+              # fenced code の終端 ``` を内容が壊さないように回避
+              text = text.replace("```", "``\\`")
+
+              out_md.write_text(
+                f"# {rel}\n\n"
+                f"> Auto-generated reference view. Source: `{rel}`\n\n"
+                f"```{lang}\n{text}\n```\n",
+                encoding="utf-8"
+              )
+              count += 1
+
+          # 3) トップページ（最低限）
+          index = ROOT / "DocsSite" / "index.md"
+          index.write_text(
+            "# EPIMETHEUS Docs\n\n"
+            "- [Specs](Specs/)\n"
+            "- [Ref (auto-generated)](Ref/)\n",
+            encoding="utf-8"
+          )
+          print(f"Generated reference pages: {count}")
+          PY
+
+      - name: Build site
+        run: mkdocs build
+
+      # Pages の 1GB制限に近づくのを早期検知（任意）
+      - name: Check site size (optional)
+        run: |
+          set -euo pipefail
+          BYTES=$(du -sb site | awk '{print $1}')
+          echo "site bytes=$BYTES"
+          # 900MB超えたら落とす（好みで調整）
+          if [ "$BYTES" -gt 900000000 ]; then
+            echo "Site too large for GitHub Pages practical limits."
+            exit 1
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

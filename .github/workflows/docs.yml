@@ -1,8 +1,8 @@
-name: Deploy Docs (MkDocs)
+name: Deploy EPIMETHEUS Docs
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 permissions:
   contents: read
@@ -10,14 +10,15 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -25,30 +26,24 @@ jobs:
           python-version: "3.x"
 
       - name: Install MkDocs
-        run: pip install mkdocs mkdocs-material
+        run: |
+          pip install mkdocs mkdocs-material
 
-      - name: Generate DocsSite (specs + text references)
+      - name: Generate DocsSite (Specs + Ref)
         run: |
           set -euo pipefail
-
           rm -rf DocsSite
           mkdir -p DocsSite
 
-          # 1) 仕様（あなたの "Docs" 相当）をコピー
-          # 例：Assets/Docs を正とする（必要なら追加）
-          if [ -d "Assets/Docs" ]; then
-            mkdir -p DocsSite/Specs
-            rsync -a --delete "Assets/Docs/" "DocsSite/Specs/"
-          fi
-
-          # 2) 参照用：テキスト系ファイルを Markdown に変換して格納
-          # meta は除外。必要に応じて拡張子を足す。
           python - <<'PY'
           import os, pathlib
 
           ROOT = pathlib.Path(".").resolve()
-          OUT  = ROOT / "DocsSite" / "Ref"
-          OUT.mkdir(parents=True, exist_ok=True)
+          DOCS = ROOT / "DocsSite"
+          SPECS = DOCS / "specs"
+          REF = DOCS / "ref"
+          SPECS.mkdir(parents=True, exist_ok=True)
+          REF.mkdir(parents=True, exist_ok=True)
 
           include_ext = {
             ".md", ".txt",
@@ -58,11 +53,10 @@ jobs:
             ".toml", ".ini", ".cfg"
           }
 
-          # 大量に拾うとサイトが肥大化するので、Unityの生成物は除外
           exclude_dir_names = {
             ".git", "Library", "Temp", "Obj", "Build", "Logs",
             "UserSettings", ".plastic", ".vscode",
-            "DocsSite"
+            "DocsSite"  # ★自己増殖防止
           }
 
           def should_skip_dir(p: pathlib.Path) -> bool:
@@ -85,79 +79,87 @@ jobs:
               except Exception:
                 return None
 
-          count = 0
-          for dirpath, dirnames, filenames in os.walk(ROOT):
-            dp = pathlib.Path(dirpath)
-            # ★生成先( DocsSite )以下は問答無用で無視
-            if (ROOT / "DocsSite") in dp.parents or dp == (ROOT / "DocsSite"):
-                dirnames[:] = []
+          # --- Specs copy: Assets/Docs -> DocsSite/specs ---
+          src_specs = ROOT / "Assets" / "Docs"
+          if src_specs.exists():
+            for p in src_specs.rglob("*"):
+              if p.is_dir():
                 continue
+              if p.suffix == ".meta":
+                continue
+              rel = p.relative_to(src_specs)
+              dst = SPECS / rel
+              dst.parent.mkdir(parents=True, exist_ok=True)
+              dst.write_bytes(p.read_bytes())
+
+          (SPECS / "index.md").write_text(
+            "# Specs\n\n"
+            "仕様書セクション。\n\n"
+            "- Conventions: `Conventions/00_Index.md`\n",
+            encoding="utf-8"
+          )
+
+          # --- Ref generate ---
+          items: list[tuple[str, str]] = []
+          count = 0
+
+          for dirpath, dirnames, filenames in os.walk(ROOT):
             dp = pathlib.Path(dirpath)
             if should_skip_dir(dp):
               dirnames[:] = []
               continue
-
-            # metaや巨大生成物を避けるため、dirnamesも一部フィルタ
             dirnames[:] = [d for d in dirnames if d not in exclude_dir_names]
 
             for fn in filenames:
               src = dp / fn
               if src.suffix == ".meta":
                 continue
-              if src.suffix.lower() not in include_ext:
+              ext = src.suffix.lower()
+              if ext not in include_ext:
                 continue
-
-              # 仕様フォルダ内の md は「Specs」にあるので Ref は重複させない（任意）
-              # ここは好みで。重複が嫌ならスキップ。
-              # if "Assets/Docs" in src.as_posix():
-              #   continue
-
-              rel = src.relative_to(ROOT)
 
               text = safe_read_text(src)
               if text is None:
-                continue  # バイナリ/読めないものは除外
+                continue
 
-              out_md = OUT / (str(rel) + ".md")
+              rel = src.relative_to(ROOT)
+              out_md = REF / (str(rel) + ".md")
               out_md.parent.mkdir(parents=True, exist_ok=True)
 
-              lang = lang_from_ext(src.suffix.lower())
-              # fenced code の終端 ``` を内容が壊さないように回避
+              lang = lang_from_ext(ext)
               text = text.replace("```", "``\\`")
 
               out_md.write_text(
                 f"# {rel}\n\n"
-                f"> Auto-generated reference view. Source: `{rel}`\n\n"
+                f"`{rel}`\n\n"
                 f"```{lang}\n{text}\n```\n",
                 encoding="utf-8"
               )
+
+              link = str(out_md.relative_to(DOCS)).replace("\\", "/")
+              items.append((str(rel), link))
               count += 1
 
-          # 3) トップページ（最低限）
-          index = ROOT / "DocsSite" / "index.md"
-          index.write_text(
-            "# EPIMETHEUS Docs\n\n"
-            "- [Specs](Specs/)\n"
-            "- [Ref (auto-generated)](Ref/)\n",
+          items.sort()
+          lines = ["# Reference\n", "自動生成された参照ページ。\n", "## Files\n"]
+          for title, link in items[:2000]:
+            lines.append(f"- [{title}]({link})")
+
+          (REF / "index.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+          (DOCS / "index.md").write_text(
+            "# 2024 EPIMETHEUS Docs\n\n"
+            "- [Specs](specs/index.md)\n"
+            "- [Reference](ref/index.md)\n",
             encoding="utf-8"
           )
+
           print(f"Generated reference pages: {count}")
           PY
 
       - name: Build site
-        run: mkdocs build
-
-      # Pages の 1GB制限に近づくのを早期検知（任意）
-      - name: Check site size (optional)
         run: |
-          set -euo pipefail
-          BYTES=$(du -sb site | awk '{print $1}')
-          echo "site bytes=$BYTES"
-          # 900MB超えたら落とす（好みで調整）
-          if [ "$BYTES" -gt 900000000 ]; then
-            echo "Site too large for GitHub Pages practical limits."
-            exit 1
-          fi
+          mkdocs build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -169,7 +171,6 @@ jobs:
     needs: build
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - id: deployment
+      - name: Deploy
         uses: actions/deploy-pages@v4

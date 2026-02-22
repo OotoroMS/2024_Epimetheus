@@ -1,9 +1,24 @@
 site_name: 2024 EPIMETHEUS Docs
 docs_dir: DocsSite
 site_dir: site
+use_directory_urls: true
 
 theme:
   name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - toc.follow
+    - search.suggest
+    - search.highlight
 
 plugins:
   - search
+
+nav:
+  - Home: index.md
+  - Specs:
+      - Overview: specs/index.md
+  - Reference:
+      - Overview: ref/index.md

@@ -45,13 +45,13 @@ jobs:
           SPECS.mkdir(parents=True, exist_ok=True)
           REF.mkdir(parents=True, exist_ok=True)
 
-          include_ext = {
-            ".md", ".txt",
-            ".json", ".yml", ".yaml",
-            ".cs", ".uxml", ".uss", ".asmdef",
-            ".xml", ".shader", ".cginc", ".hlsl",
-            ".toml", ".ini", ".cfg"
-          }
+include_ext = {
+  ".md", ".txt",
+  ".json", ".yml", ".yaml",
+  ".cs", ".uxml", ".uss", ".asmdef",
+  ".xml", ".shader", ".cginc", ".hlsl",
+  ".toml", ".ini", ".cfg"
+}
 
           exclude_dir_names = {
             ".git", "Library", "Temp", "Obj", "Build", "Logs",
@@ -59,25 +59,25 @@ jobs:
             "DocsSite"  # ★自己増殖防止
           }
 
-          def should_skip_dir(p: pathlib.Path) -> bool:
-            return any(part in exclude_dir_names for part in p.parts)
+def should_skip_dir(p: pathlib.Path) -> bool:
+  return any(part in exclude_dir_names for part in p.parts)
 
-          def lang_from_ext(ext: str) -> str:
-            return {
-              ".cs":"csharp", ".json":"json", ".yml":"yaml", ".yaml":"yaml",
-              ".uxml":"xml", ".uss":"css", ".xml":"xml",
-              ".shader":"c", ".hlsl":"hlsl", ".cginc":"c",
-              ".toml":"toml", ".ini":"ini", ".cfg":"ini", ".md":"markdown", ".txt":"text"
-            }.get(ext, "text")
+def lang_from_ext(ext: str) -> str:
+  return {
+    ".cs":"csharp", ".json":"json", ".yml":"yaml", ".yaml":"yaml",
+    ".uxml":"xml", ".uss":"css", ".xml":"xml",
+    ".shader":"c", ".hlsl":"hlsl", ".cginc":"c",
+    ".toml":"toml", ".ini":"ini", ".cfg":"ini", ".md":"markdown", ".txt":"text"
+  }.get(ext, "text")
 
-          def safe_read_text(fp: pathlib.Path) -> str | None:
-            try:
-              return fp.read_text(encoding="utf-8")
-            except UnicodeDecodeError:
-              try:
-                return fp.read_text(encoding="utf-8-sig")
-              except Exception:
-                return None
+def safe_read_text(fp: pathlib.Path) -> str | None:
+  try:
+    return fp.read_text(encoding="utf-8")
+  except UnicodeDecodeError:
+    try:
+      return fp.read_text(encoding="utf-8-sig")
+    except Exception:
+      return None
 
           # --- Specs copy: Assets/Docs -> DocsSite/specs ---
           src_specs = ROOT / "Assets" / "Docs"

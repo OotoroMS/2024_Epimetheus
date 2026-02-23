@@ -46,15 +46,17 @@ jobs:
           REF.mkdir(parents=True, exist_ok=True)
 
           include_ext = {
-            ".md", ".txt",
+            ".txt",
             ".json", ".yml", ".yaml",
             ".cs", ".uxml", ".uss", ".asmdef",
             ".xml", ".shader", ".cginc", ".hlsl",
-            ".toml", ".ini", ".cfg"
+            ".toml", ".ini", ".cfg",
+            ".md"  # ← Refでは後で除外する（Specs側に集約するため）
           }
 
           exclude_dir_names = {
-            ".git", "Library", "Temp", "Obj", "Build", "Logs",
+            ".git", ".github",  # ノイズ除外（必要なら .github は消してOK）
+            "Library", "Temp", "Obj", "Build", "Logs",
             "UserSettings", ".plastic", ".vscode",
             "DocsSite"  # ★自己増殖防止
           }
@@ -67,7 +69,7 @@ jobs:
               ".cs":"csharp", ".json":"json", ".yml":"yaml", ".yaml":"yaml",
               ".uxml":"xml", ".uss":"css", ".xml":"xml",
               ".shader":"c", ".hlsl":"hlsl", ".cginc":"c",
-              ".toml":"toml", ".ini":"ini", ".cfg":"ini", ".md":"markdown", ".txt":"text"
+              ".toml":"toml", ".ini":"ini", ".cfg":"ini", ".txt":"text"
             }.get(ext, "text")
 
           def safe_read_text(fp: pathlib.Path) -> str | None:
@@ -79,25 +81,52 @@ jobs:
               except Exception:
                 return None
 
-          # --- Specs copy: Assets/Docs -> DocsSite/specs ---
-          src_specs = ROOT / "Assets" / "Docs"
-          if src_specs.exists():
-            for p in src_specs.rglob("*"):
+          def copy_tree(src_root: pathlib.Path, dst_root: pathlib.Path):
+            for p in src_root.rglob("*"):
               if p.is_dir():
                 continue
               if p.suffix == ".meta":
                 continue
-              rel = p.relative_to(src_specs)
-              dst = SPECS / rel
+              rel = p.relative_to(src_root)
+              dst = dst_root / rel
               dst.parent.mkdir(parents=True, exist_ok=True)
               dst.write_bytes(p.read_bytes())
 
-          (SPECS / "index.md").write_text(
-            "# Specs\n\n"
-            "仕様書セクション。\n\n"
-            "- Conventions: `Conventions/00_Index.md`\n",
-            encoding="utf-8"
-          )
+          # --- Specs copy ---
+          # 1) Assets/Docs -> DocsSite/specs/
+          src_specs = ROOT / "Assets" / "Docs"
+          if src_specs.exists():
+            copy_tree(src_specs, SPECS)
+
+          # 2) Assets/Features/<Feature>/Docs -> DocsSite/specs/Features/<Feature>/
+          features_root = ROOT / "Assets" / "Features"
+          if features_root.exists():
+            for feature_dir in features_root.iterdir():
+              if not feature_dir.is_dir():
+                continue
+              docs_dir = feature_dir / "Docs"
+              if docs_dir.exists():
+                copy_tree(docs_dir, SPECS / "Features" / feature_dir.name)
+
+          # Specs index（入口）
+          spec_lines = [
+            "# Specs",
+            "",
+            "仕様書セクション。",
+            "",
+          ]
+          if (SPECS / "Conventions" / "00_Index.md").exists():
+            spec_lines.append("- [Conventions](Conventions/00_Index/)")
+          # Features の Docs があれば列挙
+          features_specs = (SPECS / "Features")
+          if features_specs.exists():
+            for d in sorted([p for p in features_specs.iterdir() if p.is_dir()], key=lambda x: x.name.lower()):
+              # 代表ページは Feature 配下の index.md があれば優先、なければフォルダリンク
+              if (d / "index.md").exists():
+                spec_lines.append(f"- [Feature: {d.name}](Features/{d.name}/index/)")
+              else:
+                spec_lines.append(f"- Feature: {d.name} (see under Features/{d.name}/)")
+          (SPECS / "index.md").write_text("\n".join(spec_lines) + "\n", encoding="utf-8")
 
           # --- Ref generate ---
           items: list[tuple[str, str]] = []
@@ -118,12 +147,19 @@ jobs:
               if ext not in include_ext:
                 continue
 
+              # ★ SpecsにMarkdownは集約。Refでは .md を生成しない（.md.mdも防ぐ）
+              if ext == ".md":
+                continue
+
               text = safe_read_text(src)
               if text is None:
                 continue
 
               rel = src.relative_to(ROOT)
-              out_md = REF / (str(rel) + ".md")
+
+              # ★ 出力は「元ファイル名.ext.md」形式
+              # 例: EnemyParams.json -> EnemyParams.json.md
+              out_md = REF / rel.parent / (rel.name + ".md")
               out_md.parent.mkdir(parents=True, exist_ok=True)
 
               lang = lang_from_ext(ext)
@@ -136,21 +172,22 @@ jobs:
                 encoding="utf-8"
               )
 
-              link = str(out_md.relative_to(DOCS)).replace("\\", "/")
+              # ★ ref/index.md から見た相対リンク（ref/ を付けない）
+              link = str(out_md.relative_to(REF)).replace("\\", "/")
               items.append((str(rel), link))
               count += 1
 
           items.sort()
-          lines = ["# Reference\n", "自動生成された参照ページ。\n", "## Files\n"]
+          lines = ["# Reference", "", "自動生成された参照ページ。", "", "## Files"]
           for title, link in items[:2000]:
             lines.append(f"- [{title}]({link})")
-
           (REF / "index.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
+          # Site Home
           (DOCS / "index.md").write_text(
             "# 2024 EPIMETHEUS Docs\n\n"
-            "- [Specs](specs/index.md)\n"
-            "- [Reference](ref/index.md)\n",
+            "- [Specs](specs/)\n"
+            "- [Reference](ref/)\n",
             encoding="utf-8"
           )
 
